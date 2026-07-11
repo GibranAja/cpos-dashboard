@@ -8,9 +8,28 @@ import { usePermissions } from '@/lib/permissions';
 import orders from '@/routes/orders';
 import type { OrderDetail } from '@/types/pos';
 
-export default function OrderShow({ order }: { order: OrderDetail }) {
+export default function OrderShow({ order }: { order: OrderDetail | null }) {
     const { canManage } = usePermissions();
     const [voiding, setVoiding] = useState(false);
+
+    if (!order) {
+        return (
+            <AppLayout title="Pesanan tidak ditemukan">
+                <Head title="Pesanan tidak ditemukan" />
+                <PageHeader
+                    title="Pesanan tidak ditemukan"
+                    action={
+                        <Link href={orders.index().url}>
+                            <Button variant="ghost">Kembali</Button>
+                        </Link>
+                    }
+                />
+                <p className="text-muted">Data pesanan tidak tersedia.</p>
+            </AppLayout>
+        );
+    }
+
+    const items = order.items ?? [];
     const isVoid = order.status === 'void';
 
     return (
@@ -43,7 +62,7 @@ export default function OrderShow({ order }: { order: OrderDetail }) {
                 <div className="card p-5">
                     <h3 className="mb-3 font-display text-lg font-semibold text-ink">Item</h3>
                     <ul className="divide-y divide-line">
-                        {order.items.map((it, i) => (
+                        {items.map((it, i) => (
                             <li key={i} className="py-3">
                                 <div className="flex items-center justify-between">
                                     <span className="font-medium text-ink">

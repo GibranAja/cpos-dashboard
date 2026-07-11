@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Transactions;
 use App\Http\Controllers\Concerns\InteractsWithPosApi;
 use App\Http\Controllers\Controller;
 use App\Services\Pos\PosApiClient;
-use App\Services\Pos\PosApiException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -35,7 +34,7 @@ class OrdersController extends Controller
     public function show(string $order): Response
     {
         return Inertia::render('transactions/orders/show', [
-            'order' => fn () => $this->api->get("/orders/{$order}"),
+            'order' => fn () => $this->api->get("/orders/{$order}")['order'] ?? null,
         ]);
     }
 
