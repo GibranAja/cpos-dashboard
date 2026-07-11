@@ -45,6 +45,7 @@ Route::middleware('dashboard')->group(function (): void {
     Route::post('products', [ProductsController::class, 'store'])->name('products.store');
     Route::get('products/{product}/price-history', [ProductsController::class, 'priceHistory'])->name('products.price-history');
     Route::post('products/import', [ProductsController::class, 'import'])->name('products.import');
+    Route::post('products/bulk-delete', [ProductsController::class, 'bulkDestroy'])->name('products.bulk-destroy');
     Route::patch('products/{product}', [ProductsController::class, 'update'])->name('products.update');
     Route::delete('products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy');
     Route::post('products/{product}/restore', [ProductsController::class, 'restore'])->name('products.restore');
@@ -56,6 +57,7 @@ Route::middleware('dashboard')->group(function (): void {
     Route::get('categories/create', [CategoriesController::class, 'create'])->name('categories.create');
     Route::get('categories/{category}/edit', [CategoriesController::class, 'edit'])->name('categories.edit');
     Route::post('categories', [CategoriesController::class, 'store'])->name('categories.store');
+    Route::post('categories/bulk-delete', [CategoriesController::class, 'bulkDestroy'])->name('categories.bulk-destroy');
     Route::patch('categories/{category}', [CategoriesController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
     Route::post('categories/{category}/restore', [CategoriesController::class, 'restore'])->name('categories.restore');
@@ -65,6 +67,7 @@ Route::middleware('dashboard')->group(function (): void {
     Route::get('modifier-groups/create', [ModifierGroupsController::class, 'create'])->name('modifier-groups.create');
     Route::get('modifier-groups/{group}/edit', [ModifierGroupsController::class, 'edit'])->name('modifier-groups.edit');
     Route::post('modifier-groups', [ModifierGroupsController::class, 'store'])->name('modifier-groups.store');
+    Route::post('modifier-groups/bulk-delete', [ModifierGroupsController::class, 'bulkDestroy'])->name('modifier-groups.bulk-destroy');
     Route::patch('modifier-groups/{group}', [ModifierGroupsController::class, 'update'])->name('modifier-groups.update');
     Route::delete('modifier-groups/{group}', [ModifierGroupsController::class, 'destroy'])->name('modifier-groups.destroy');
     Route::post('modifier-groups/{group}/modifiers', [ModifierGroupsController::class, 'storeModifier'])->name('modifier-groups.modifiers.store');
@@ -88,6 +91,7 @@ Route::middleware('dashboard')->group(function (): void {
     Route::get('ingredients/create', [IngredientsController::class, 'create'])->name('ingredients.create');
     Route::get('ingredients/{ingredient}/edit', [IngredientsController::class, 'edit'])->name('ingredients.edit');
     Route::post('ingredients', [IngredientsController::class, 'store'])->name('ingredients.store');
+    Route::post('ingredients/bulk-delete', [IngredientsController::class, 'bulkDestroy'])->name('ingredients.bulk-destroy');
     Route::patch('ingredients/{ingredient}', [IngredientsController::class, 'update'])->name('ingredients.update');
     Route::delete('ingredients/{ingredient}', [IngredientsController::class, 'destroy'])->name('ingredients.destroy');
     Route::post('ingredients/{ingredient}/restore', [IngredientsController::class, 'restore'])->name('ingredients.restore');
@@ -102,6 +106,7 @@ Route::middleware('dashboard')->group(function (): void {
     Route::get('suppliers/create', [SuppliersController::class, 'create'])->name('suppliers.create');
     Route::get('suppliers/{supplier}/edit', [SuppliersController::class, 'edit'])->name('suppliers.edit');
     Route::post('suppliers', [SuppliersController::class, 'store'])->name('suppliers.store');
+    Route::post('suppliers/bulk-delete', [SuppliersController::class, 'bulkDestroy'])->name('suppliers.bulk-destroy');
     Route::patch('suppliers/{supplier}', [SuppliersController::class, 'update'])->name('suppliers.update');
     Route::delete('suppliers/{supplier}', [SuppliersController::class, 'destroy'])->name('suppliers.destroy');
 
@@ -147,6 +152,7 @@ Route::middleware('dashboard')->group(function (): void {
         Route::get('users/create', [UsersController::class, 'create'])->name('users.create');
         Route::get('users/{user}/edit', [UsersController::class, 'edit'])->name('users.edit');
         Route::post('users', [UsersController::class, 'store'])->name('users.store');
+        Route::post('users/bulk-delete', [UsersController::class, 'bulkDestroy'])->name('users.bulk-destroy');
         Route::patch('users/{user}', [UsersController::class, 'update'])->name('users.update');
         Route::post('users/{user}/reset-password', [UsersController::class, 'resetPassword'])->name('users.reset-password');
         Route::delete('users/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
@@ -156,6 +162,7 @@ Route::middleware('dashboard')->group(function (): void {
         Route::get('outlets/create', [OutletsController::class, 'create'])->name('outlets.create');
         Route::get('outlets/{outlet}/edit', [OutletsController::class, 'edit'])->name('outlets.edit');
         Route::post('outlets', [OutletsController::class, 'store'])->name('outlets.store');
+        Route::post('outlets/bulk-delete', [OutletsController::class, 'bulkDestroy'])->name('outlets.bulk-destroy');
         Route::patch('outlets/{outlet}', [OutletsController::class, 'update'])->name('outlets.update');
         Route::delete('outlets/{outlet}', [OutletsController::class, 'destroy'])->name('outlets.destroy');
 

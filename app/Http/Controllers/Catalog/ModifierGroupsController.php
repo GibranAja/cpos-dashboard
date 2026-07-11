@@ -63,6 +63,19 @@ class ModifierGroupsController extends Controller
         );
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['string'],
+        ]);
+
+        return $this->runPosWrite(
+            fn () => $this->api->post('/modifier-groups/bulk-delete', $data),
+            'Grup modifier terpilih dihapus.',
+        );
+    }
+
     public function storeModifier(Request $request, string $group): RedirectResponse
     {
         return $this->runPosWrite(

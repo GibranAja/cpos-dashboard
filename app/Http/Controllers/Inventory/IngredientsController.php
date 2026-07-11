@@ -78,6 +78,19 @@ class IngredientsController extends Controller
         );
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['string'],
+        ]);
+
+        return $this->runPosWrite(
+            fn () => $this->api->post('/ingredients/bulk-delete', $data),
+            'Bahan terpilih dihapus.',
+        );
+    }
+
     public function restore(string $ingredient): RedirectResponse
     {
         return $this->runPosWrite(

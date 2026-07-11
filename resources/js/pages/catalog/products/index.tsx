@@ -1,11 +1,12 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import { TextInput } from '@/components/form';
-import { Badge, Button, EmptyState, Modal, PageHeader } from '@/components/ui';
+import { Badge, Button, Checkbox, EmptyState, Modal, PageHeader, SelectionBar } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
 import { rupiah } from '@/lib/format';
 import { initials, thumb } from '@/lib/image';
 import { usePermissions } from '@/lib/permissions';
+import { useRowSelection } from '@/lib/use-row-selection';
 import products from '@/routes/products';
 import type { Category, PriceHistoryEntry, Product } from '@/types/pos';
 import { ImportModal } from './import-modal';
@@ -27,6 +28,16 @@ export default function Products({ products: items, categories }: Props) {
     );
 
     const categoryName = (id: string | null) => categories.find((c) => c.id === id)?.name ?? '—';
+
+    const selectableIds = useMemo(() => filtered.filter((p) => !p.deletedAt).map((p) => p.id), [filtered]);
+    const sel = useRowSelection(selectableIds);
+
+    const bulkDelete = () =>
+        router.post(
+            '/products/bulk-delete',
+            { ids: sel.selectedIds },
+            { preserveScroll: true, onSuccess: () => sel.clear() },
+        );
 
     return (
         <AppLayout title="Produk">
@@ -60,6 +71,16 @@ export default function Products({ products: items, categories }: Props) {
                     <table className="w-full text-sm">
                         <thead className="border-b border-line text-left text-muted">
                             <tr>
+                                {canManage && (
+                                    <th className="w-10 p-4">
+                                        <Checkbox
+                                            checked={sel.allSelected}
+                                            indeterminate={sel.someSelected}
+                                            onChange={sel.toggleAll}
+                                            ariaLabel="Pilih semua produk"
+                                        />
+                                    </th>
+                                )}
                                 <th className="p-4 font-medium">Nama</th>
                                 <th className="p-4 font-medium">Kategori</th>
                                 <th className="p-4 font-medium">Harga</th>
@@ -70,6 +91,17 @@ export default function Products({ products: items, categories }: Props) {
                         <tbody className="divide-y divide-line">
                             {filtered.map((p) => (
                                 <tr key={p.id} className="transition hover:bg-soft/30">
+                                    {canManage && (
+                                        <td className="w-10 p-4">
+                                            {!p.deletedAt && (
+                                                <Checkbox
+                                                    checked={sel.isSelected(p.id)}
+                                                    onChange={() => sel.toggle(p.id)}
+                                                    ariaLabel={`Pilih ${p.name}`}
+                                                />
+                                            )}
+                                        </td>
+                                    )}
                                     <td className="p-4 font-medium text-ink">
                                         <span className="flex items-center gap-2">
                                             <ProductThumb product={p} />
@@ -125,6 +157,10 @@ export default function Products({ products: items, categories }: Props) {
                         </tbody>
                     </table>
                 </div>
+            )}
+
+            {canManage && (
+                <SelectionBar count={sel.count} itemLabel="produk" onClear={sel.clear} onDelete={bulkDelete} />
             )}
 
             {historyFor && <PriceHistoryModal product={historyFor} onClose={() => setHistoryFor(null)} />}

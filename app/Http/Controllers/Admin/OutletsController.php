@@ -63,6 +63,19 @@ class OutletsController extends Controller
         );
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['string'],
+        ]);
+
+        return $this->runPosWrite(
+            fn () => $this->api->post('/outlets/bulk-delete', $data),
+            'Outlet terpilih dihapus.',
+        );
+    }
+
     /**
      * @return array<string, mixed>
      */

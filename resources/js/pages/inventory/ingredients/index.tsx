@@ -1,8 +1,10 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Badge, Button, EmptyState, PageHeader } from '@/components/ui';
+import { useMemo } from 'react';
+import { Badge, Button, Checkbox, EmptyState, PageHeader, SelectionBar } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
 import { rupiah } from '@/lib/format';
 import { usePermissions } from '@/lib/permissions';
+import { useRowSelection } from '@/lib/use-row-selection';
 import ingredients from '@/routes/ingredients';
 import type { Ingredient, Uom } from '@/types/pos';
 
@@ -12,6 +14,11 @@ export default function Ingredients({ ingredients: items, uom }: Props) {
     const { canManage } = usePermissions();
 
     const uomCode = (id: string) => uom.find((u) => u.id === id)?.code ?? '';
+
+    const selectableIds = useMemo(() => items.filter((i) => !i.deletedAt).map((i) => i.id), [items]);
+    const sel = useRowSelection(selectableIds);
+    const bulkDelete = () =>
+        router.post('/ingredients/bulk-delete', { ids: sel.selectedIds }, { preserveScroll: true, onSuccess: () => sel.clear() });
 
     return (
         <AppLayout title="Bahan">
@@ -35,6 +42,16 @@ export default function Ingredients({ ingredients: items, uom }: Props) {
                     <table className="w-full text-sm">
                         <thead className="border-b border-line text-left text-muted">
                             <tr>
+                                {canManage && (
+                                    <th className="w-10 p-4">
+                                        <Checkbox
+                                            checked={sel.allSelected}
+                                            indeterminate={sel.someSelected}
+                                            onChange={sel.toggleAll}
+                                            ariaLabel="Pilih semua bahan"
+                                        />
+                                    </th>
+                                )}
                                 <th className="p-4 font-medium">Nama</th>
                                 <th className="p-4 font-medium">Stok</th>
                                 <th className="p-4 font-medium">Reorder</th>
@@ -49,6 +66,17 @@ export default function Ingredients({ ingredients: items, uom }: Props) {
 
                                 return (
                                     <tr key={i.id} className="transition hover:bg-soft/30">
+                                        {canManage && (
+                                            <td className="w-10 p-4">
+                                                {!i.deletedAt && (
+                                                    <Checkbox
+                                                        checked={sel.isSelected(i.id)}
+                                                        onChange={() => sel.toggle(i.id)}
+                                                        ariaLabel={`Pilih ${i.name}`}
+                                                    />
+                                                )}
+                                            </td>
+                                        )}
                                         <td className="p-4 font-medium text-ink">{i.name}</td>
                                         <td className="p-4">
                                             <span className={low ? 'text-primary-dark' : 'text-ink'}>
@@ -101,6 +129,10 @@ export default function Ingredients({ ingredients: items, uom }: Props) {
                         </tbody>
                     </table>
                 </div>
+            )}
+
+            {canManage && (
+                <SelectionBar count={sel.count} itemLabel="bahan" onClear={sel.clear} onDelete={bulkDelete} />
             )}
         </AppLayout>
     );

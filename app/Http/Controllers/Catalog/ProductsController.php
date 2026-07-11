@@ -102,6 +102,19 @@ class ProductsController extends Controller
         );
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['string'],
+        ]);
+
+        return $this->runPosWrite(
+            fn () => $this->api->post('/products/bulk-delete', $data),
+            'Produk terpilih dihapus.',
+        );
+    }
+
     /**
      * Upload/replace the product image. The API stores it on Cloudinary and
      * returns the updated product ({imageUrl, imagePublicId}).

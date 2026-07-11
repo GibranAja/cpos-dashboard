@@ -71,6 +71,19 @@ class CategoriesController extends Controller
         );
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['string'],
+        ]);
+
+        return $this->runPosWrite(
+            fn () => $this->api->post('/categories/bulk-delete', $data),
+            'Kategori terpilih dihapus.',
+        );
+    }
+
     /**
      * @return array<string, mixed>
      */

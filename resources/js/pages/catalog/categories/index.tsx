@@ -1,12 +1,19 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Badge, Button, EmptyState, PageHeader } from '@/components/ui';
+import { useMemo } from 'react';
+import { Badge, Button, Checkbox, EmptyState, PageHeader, SelectionBar } from '@/components/ui';
 import AppLayout from '@/layouts/app-layout';
 import { usePermissions } from '@/lib/permissions';
+import { useRowSelection } from '@/lib/use-row-selection';
 import categories from '@/routes/categories';
 import type { Category } from '@/types/pos';
 
 export default function Categories({ categories: items }: { categories: Category[] }) {
     const { canManage } = usePermissions();
+
+    const selectableIds = useMemo(() => items.filter((c) => !c.deletedAt).map((c) => c.id), [items]);
+    const sel = useRowSelection(selectableIds);
+    const bulkDelete = () =>
+        router.post('/categories/bulk-delete', { ids: sel.selectedIds }, { preserveScroll: true, onSuccess: () => sel.clear() });
 
     return (
         <AppLayout title="Kategori">
@@ -28,9 +35,27 @@ export default function Categories({ categories: items }: { categories: Category
                 <EmptyState>Belum ada kategori.</EmptyState>
             ) : (
                 <div className="card divide-y divide-line">
+                    {canManage && selectableIds.length > 0 && (
+                        <label className="flex items-center gap-3 p-4 text-sm text-muted">
+                            <Checkbox
+                                checked={sel.allSelected}
+                                indeterminate={sel.someSelected}
+                                onChange={sel.toggleAll}
+                                ariaLabel="Pilih semua kategori"
+                            />
+                            Pilih semua
+                        </label>
+                    )}
                     {items.map((c) => (
                         <div key={c.id} className="flex items-center justify-between p-4 transition hover:bg-soft/30">
                             <div className="flex items-center gap-3">
+                                {canManage && !c.deletedAt && (
+                                    <Checkbox
+                                        checked={sel.isSelected(c.id)}
+                                        onChange={() => sel.toggle(c.id)}
+                                        ariaLabel={`Pilih ${c.name}`}
+                                    />
+                                )}
                                 <span className="font-medium text-ink">{c.name}</span>
                                 {c.isActive ? <Badge tone="active">Aktif</Badge> : <Badge tone="muted">Nonaktif</Badge>}
                                 {c.deletedAt && <Badge>Terhapus</Badge>}
@@ -63,6 +88,10 @@ export default function Categories({ categories: items }: { categories: Category
                         </div>
                     ))}
                 </div>
+            )}
+
+            {canManage && (
+                <SelectionBar count={sel.count} itemLabel="kategori" onClear={sel.clear} onDelete={bulkDelete} />
             )}
         </AppLayout>
     );
